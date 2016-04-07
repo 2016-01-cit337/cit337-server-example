@@ -14,6 +14,7 @@ public class ActionAuthenticator extends Security.Authenticator {
         if (token != null) {
             User user = Ebean.find(User.class).where().eq("token", token).findUnique();
             if (user != null) {
+                ctx.session().put("User", user.getId().toString());
                 return user.getEmail();
             }
         }

@@ -1,6 +1,7 @@
 package models;
 
 import com.avaje.ebean.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import play.data.validation.Constraints;
 import play.*;
 
@@ -33,6 +34,19 @@ public class User extends Model{
 
     @Constraints.Required
     private String password;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Publication> publications;
+
+    public List<Publication> getPublications() {
+        return publications;
+    }
+
+    public void setPublications(List<Publication> publications) {
+        this.publications = publications;
+    }
+
 
     public String getToken() {
         return token;

@@ -18,3 +18,11 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 POST    /api/register               controllers.UserController.register
 POST    /api/login                  controllers.UserController.authenticate
 GET     /api/logout                 controllers.UserController.logout(id:Long)
+
+# Publication Services API
+POST    /api/addpublication         controllers.PublicationController.addPublication
+POST    /api/editpublication        controllers.PublicationController.updatePublication
+GET     /api/deletepublication      controllers.PublicationController.deletePublication(id:Long)
+GET     /api/getpublication         controllers.PublicationController.getPublication(id:Long)
+GET     /api/getallpublications     controllers.PublicationController.getAllPublications
+

@@ -85,9 +85,16 @@ public class UserController extends Controller {
 
     private Result createUser()
     {
+        Login ret = new Login();
         User user = Json.fromJson(request().body().asJson(), User.class);
         Ebean.save(user);
-        return created(Json.toJson(user));
+        String authToken = generateAuthToken();
+        user.setToken(authToken);
+        Ebean.update(user);
+        ret.token = authToken;
+        ret.email = user.getEmail();
+        ret.id = user.getId();
+        return ok(Json.toJson(ret));
     }
 
     private Result updateUser(Long id)
@@ -105,16 +112,18 @@ public class UserController extends Controller {
     }
 
     // Endpoint for user login
-    public Result authenticate() {
-        // 1. Define class to send JSON response back
-        class Login {
-            public Long     id;
-            public String email;
-            public String token;
+    // 1. Define class to send JSON response back
+    class Login {
+        public Long     id;
+        public String email;
+        public String token;
 
-            public Login() {
-            }
+        public Login() {
         }
+    }
+    public Result authenticate() {
+        //1. For debugging only
+        List<User> users = Ebean.find(User.class).findList();
 
         // 2. Read email and password from request()
         JsonNode request = request().body().asJson();
