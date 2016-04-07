@@ -34,11 +34,21 @@ public class User extends Model{
     @Constraints.Required
     private String password;
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    private String token;
+
     public String getPassword() {
         return password;
     }
     public void setPassword(String password) {
-        this.password = password;
+        this.password = User.getSha512(password);
     }
 
     public Long getId() {
@@ -108,7 +118,7 @@ public class User extends Model{
     }
 
     public void setConfirm_password(String confirm_password) {
-        this.confirm_password = confirm_password;
+        this.confirm_password = User.getSha512(confirm_password);
     }
 
     // Transient field
@@ -116,12 +126,19 @@ public class User extends Model{
     String confirm_password;
 
     // Get SHA password
-    public static byte[] getSha512(String value) {
+    public static String getSha512(String input) {
+        MessageDigest mDigest = null;
         try {
-            return MessageDigest.getInstance("SHA-512").digest(value.getBytes("UTF-8"));
+            mDigest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            return "";
         }
-        catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+        byte[] result = mDigest.digest(input.getBytes());
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < result.length; i++) {
+            sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
         }
+        return sb.toString();
     }
+
 }

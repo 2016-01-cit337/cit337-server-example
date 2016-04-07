@@ -11,6 +11,7 @@ import play.libs.*;
 import models.*;
 
 import javax.inject.Inject;
+import java.security.SecureRandom;
 import java.util.List;
 
 /**
@@ -92,7 +93,6 @@ public class UserController extends Controller {
     private Result updateUser(Long id)
     {
         User user = Json.fromJson(request().body().asJson(), User.class);
-        //user.update();
         Ebean.update(user);
         return ok(Json.toJson(user));
     }
@@ -101,7 +101,66 @@ public class UserController extends Controller {
     {
         User user = Ebean.find(User.class, id);
         Ebean.delete(user);
-        //user.delete();
         return noContent(); // http://stackoverflow.com/a/2342589/1415732
     }
+
+    // Endpoint for user login
+    public Result authenticate() {
+        // 1. Define class to send JSON response back
+        class Login {
+            public Long     id;
+            public String email;
+            public String token;
+
+            public Login() {
+            }
+        }
+
+        // 2. Read email and password from request()
+        JsonNode request = request().body().asJson();
+        String email = request.get("email").asText();
+        String password = request.get("password").asText();
+
+        // 3. Find user with given email
+        Login ret = new Login();
+        User user = User.findByEmail(email);
+        if (user == null) {
+            return unauthorized(Json.toJson(ret));
+        }
+        // 4. Compare password.
+        String sha256 = User.getSha512(request.get("password").asText());
+        if (sha256.equals(user.getPassword())) {
+            // Success
+            String authToken = generateAuthToken();
+            user.setToken(authToken);
+            Ebean.update(user);
+            ret.token = authToken;
+            ret.email = user.getEmail();
+            ret.id = user.getId();
+            return ok(Json.toJson(ret));
+
+        }
+        // 5. Unauthorized access
+        return unauthorized();
+    }
+
+    //@Security.Authenticated(ActionAuthenticator.class)
+    private String generateAuthToken() {
+        SecureRandom random = new SecureRandom();
+        byte bytes[] = new byte[20];
+        random.nextBytes(bytes);
+        return bytes.toString();
+    }
+
+    @Security.Authenticated(ActionAuthenticator.class)
+    public Result logout(long id) {
+        User user = Ebean.find(User.class, id);
+        if (user != null) {
+            user.setToken(generateAuthToken());
+            Ebean.save(user);
+            return ok();
+        }
+        return unauthorized();
+    }
+
 }
