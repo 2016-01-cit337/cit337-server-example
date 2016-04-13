@@ -17,12 +17,12 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 # Professional Services API
 POST    /api/register               controllers.UserController.register
 POST    /api/login                  controllers.UserController.authenticate
+GET     /api/authcall               controllers.UserController.authCall
 GET     /api/logout                 controllers.UserController.logout(id:Long)
 
-# Publication Services API
+# Add route for publication
 POST    /api/addpublication         controllers.PublicationController.addPublication
-POST    /api/editpublication        controllers.PublicationController.updatePublication
-GET     /api/deletepublication      controllers.PublicationController.deletePublication(id:Long)
-GET     /api/getpublication         controllers.PublicationController.getPublication(id:Long)
 GET     /api/getallpublications     controllers.PublicationController.getAllPublications
-
+GET     /api/getpublication         controllers.PublicationController.getPublication(id:Long)
+GET     /api/searchprofessionals    controllers.UserController.search(search_string:String)
+GET     /api/deletepublication      controllers.PublicationController.deletePublication(id:Long)

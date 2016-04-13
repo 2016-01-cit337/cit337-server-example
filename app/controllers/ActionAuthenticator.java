@@ -1,18 +1,18 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
-import models.User;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
 
-public class ActionAuthenticator extends Security.Authenticator {
+import models.User;
 
+public class ActionAuthenticator extends Security.Authenticator {
     @Override
     public String getUsername(Http.Context ctx) {
         String token = getTokenFromHeader(ctx);
         if (token != null) {
-            User user = Ebean.find(User.class).where().eq("token", token).findUnique();
+            User user = Ebean.find(User.class).where().eq("authToken", token).findUnique();
             if (user != null) {
                 ctx.session().put("User", user.getId().toString());
                 return user.getEmail();

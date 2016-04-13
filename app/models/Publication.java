@@ -1,14 +1,13 @@
 package models;
 
 import com.avaje.ebean.Model;
-import com.avaje.ebean.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import play.data.validation.Constraints;
 
 import javax.persistence.*;
 
 /**
- * Created by npatel on 4/3/16.
+ * Created by npatel on 4/5/16.
  */
 @Entity
 public class Publication extends Model {
@@ -36,14 +35,6 @@ public class Publication extends Model {
 
     @Constraints.Required
     private int year;
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
@@ -113,16 +104,11 @@ public class Publication extends Model {
         this.year = year;
     }
 
-    // Transient variables, especially required for adding publication for
-    // a user
-//    @Transient
-//    private Long owner_id;
-//
-//    public Long getOwner_id() {
-//        return owner_id;
-//    }
-//
-//    public void setOwner_id(Long owner_id) {
-//        this.owner_id = owner_id;
-//    }
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
 }

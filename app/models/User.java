@@ -8,7 +8,6 @@ import play.*;
 import javax.annotation.Generated;
 import javax.persistence.*;
 import javax.validation.Constraint;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -23,47 +22,26 @@ public class User extends Model{
     private Long id;
 
     @Constraints.Required
+    @Constraints.MinLength(3)
     private String first_name;
 
     @Constraints.Required
+    @Constraints.MinLength(3)
     private String last_name;
 
     @Constraints.Required
     @Constraints.Email
     private String email;
 
-    @Constraints.Required
-    private String password;
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<Publication> publications;
-
-    public List<Publication> getPublications() {
-        return publications;
+    public String getAuthToken() {
+        return authToken;
     }
 
-    public void setPublications(List<Publication> publications) {
-        this.publications = publications;
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    private String token;
-
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = User.getSha512(password);
-    }
+    private String authToken;
 
     public Long getId() {
         return id;
@@ -96,6 +74,19 @@ public class User extends Model{
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+            this.password = User.sha256(password);
+    }
+
+    @Constraints.Required
+    @Constraints.MinLength(6)
+    private String password;
+
     // Methods
     //public static Finder<Long,User> find = new Finder<>(Long.class, User.class);
 
@@ -127,20 +118,19 @@ public class User extends Model{
     }
 
     // Transient field
-    public String getConfirm_password() {
-        return confirm_password;
-    }
-
-    public void setConfirm_password(String confirm_password) {
-        this.confirm_password = User.getSha512(confirm_password);
-    }
-
-    // Transient field
     @Transient
     String confirm_password;
 
-    // Get SHA password
-    public static String getSha512(String input) {
+    // Transient field
+    public String getConfirm_password() {
+        return confirm_password;
+    }
+    public void setConfirm_password(String confirm_password) {
+        this.confirm_password = User.sha256(confirm_password);
+    }
+
+    // 256 Sha hashing
+    public static String sha256(String input) {
         MessageDigest mDigest = null;
         try {
             mDigest = MessageDigest.getInstance("SHA-256");
@@ -155,4 +145,15 @@ public class User extends Model{
         return sb.toString();
     }
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Publication> publications;
+
+    public List<Publication> getPublications() {
+        return publications;
+    }
+
+    public void setPublications(List<Publication> publications) {
+        this.publications = publications;
+    }
 }
