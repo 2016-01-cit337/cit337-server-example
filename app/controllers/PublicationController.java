@@ -1,7 +1,6 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
-import com.fasterxml.jackson.databind.JsonNode;
 import models.Publication;
 import models.User;
 import play.data.Form;
@@ -10,13 +9,11 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import scala.util.parsing.json.JSONArray;
 
 import javax.inject.Inject;
-import java.util.List;
 
 /**
- * Created by npatel on 4/3/16.
+ * Created by npatel on 4/5/16.
  */
 public class PublicationController extends Controller{
     @Inject
@@ -32,7 +29,6 @@ public class PublicationController extends Controller{
         if(form.hasErrors())
             return badRequest(form.errorsAsJson());
 
-        // Save the entry
         User user = Ebean.find(User.class, Long.parseLong(session().get("User")));
         publication.setOwner(user);
         if(publication.getId() != 0)
@@ -43,13 +39,6 @@ public class PublicationController extends Controller{
     }
 
     @Security.Authenticated(ActionAuthenticator.class)
-    public Result getPublication(Long id)
-    {
-        Publication publication = Ebean.find(Publication.class,id);
-        return publication == null ? notFound() : ok(Json.toJson(publication));
-    }
-
-    @Security.Authenticated(ActionAuthenticator.class)
     public Result getAllPublications()
     {
         User user = Ebean.find(User.class, Long.parseLong(session().get("User")));
@@ -57,19 +46,10 @@ public class PublicationController extends Controller{
     }
 
     @Security.Authenticated(ActionAuthenticator.class)
-    public Result updatePublication()
+    public Result getPublication(Long id)
     {
-        Publication publication = Json.fromJson(request().body().asJson(), Publication.class);
-        if(publication == null)
-            return badRequest();
-        Form<Publication> form = formFactory.form(Publication.class).bindFromRequest();
-
-        if(form.hasErrors())
-            return badRequest(form.errorsAsJson());
-        User user = Ebean.find(User.class, Long.parseLong(session().get("User")));
-        publication.setOwner(user);
-        Ebean.update(publication);
-        return ok();
+        Publication publication = Ebean.find(Publication.class,id);
+        return publication == null ? notFound() : ok(Json.toJson(publication));
     }
 
     @Security.Authenticated(ActionAuthenticator.class)
@@ -83,5 +63,6 @@ public class PublicationController extends Controller{
         Ebean.delete(publication);
         return ok();
     }
+
 
 }

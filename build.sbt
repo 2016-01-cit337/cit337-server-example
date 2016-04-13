@@ -10,7 +10,5 @@ libraryDependencies ++= Seq(
   javaJdbc,
   cache,
   javaWs,
-  evolutions,
-  "org.xerial" % "sqlite-jdbc" % "3.8.0-SNAPSHOT"
+  evolutions
 )
-resolvers += "SQLite-JDBC Repository" at "https://oss.sonatype.org/content/repositories/snapshots"
